@@ -1,0 +1,33 @@
+name: vnstat
+
+services:
+  vnstat:
+    image: vergoh/vnstat:latest
+    container_name: vnstat
+    restart: unless-stopped
+    network_mode: host
+    security_opt:
+      - no-new-privileges:true
+
+    environment:
+      - HTTP_PORT=8685
+      - HTTP_BIND=127.0.0.1
+      - EXCLUDE_PATTERN=^docker|^veth|^br-|^lo
+      - TZ=Europe/Madrid
+
+    volumes:
+      - ./vnstat-data:/var/lib/vnstat
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 64M
+        reservations:
+          memory: 16M
