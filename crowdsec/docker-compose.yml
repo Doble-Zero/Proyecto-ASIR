@@ -1,0 +1,38 @@
+name: crowdsec
+
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+    environment:
+      - TZ=Europe/Madrid
+      - COLLECTIONS=crowdsecurity/nginx crowdsecurity/sshd
+
+    volumes:
+      - ./config:/etc/crowdsec
+      - ./data:/var/lib/crowdsec/data
+      - /var/log/auth.log:/logs/auth.log:ro
+      - /home/usuarioa/Docker/Red y Seguridad/Nginx Proxy Manager/data/logs:/logs/nginx:ro
+
+    networks:
+      - proxy_net
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+
+networks:
+  proxy_net:
+    external: true
