@@ -1,0 +1,40 @@
+name: bot-blahaj-beta
+
+services:
+  bot_blahaj:
+    build: .
+    container_name: bot-blahaj-beta
+    restart: unless-stopped
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - ./src/.env
+
+    environment:
+      - TZ=Europe/Madrid
+      - PYTHONUNBUFFERED=1
+
+    volumes:
+      - ./src:/app/src
+      - ./guilds:/app/guilds
+      - ./logs:/app/logs
+
+    networks:
+      - bot_beta_net
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 640M
+
+networks:
+  bot_beta_net:
+    driver: bridge
