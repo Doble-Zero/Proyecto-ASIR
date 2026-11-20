@@ -1,0 +1,31 @@
+name: web-bot-blahaj
+
+services:
+  web-bot-blahaj:
+    build: .
+    container_name: web-bot-blahaj
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+    volumes:
+      - .:/usr/local/apache2/htdocs/:ro
+
+    networks:
+      - proxy_net
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 50M
+
+networks:
+  proxy_net:
+    external: true
