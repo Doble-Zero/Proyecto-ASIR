@@ -1,0 +1,45 @@
+name: speedtest-tracker
+
+services:
+  speedtest-tracker:
+    image: lscr.io/linuxserver/speedtest-tracker:latest
+    container_name: speedtest-tracker
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+      - DISPLAY_TIMEZONE=Europe/Madrid
+      - APP_KEY= CENSUADO
+      - DB_CONNECTION=sqlite
+      - SPEEDTEST_SCHEDULE=0 */1 * * *
+
+    ports:
+      - "192.168.1.35:8072:80"   # Interfaz web HTTP (red LAN)
+      - "192.168.1.35:8472:443"  # Interfaz web HTTPS (red LAN)
+
+    volumes:
+      - ./data:/config
+      - ./ssl-keys:/config/keys
+
+    networks:
+      - proxy_net
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 512M
+
+networks:
+  proxy_net:
+    external: true
