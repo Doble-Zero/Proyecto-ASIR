@@ -1,0 +1,40 @@
+name: nginx-proxy-manager
+
+services:
+  app:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+    environment:
+      - TZ=Europe/Madrid
+
+    ports:
+      - '80:80'                # Tráfico web HTTP
+      - '127.0.0.1:81:81'      # Panel de administración web (local)
+      - '443:443'              # Tráfico web seguro HTTPS
+
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+
+    networks:
+      - proxy_net
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 512M
+
+networks:
+  proxy_net:
+    external: true
