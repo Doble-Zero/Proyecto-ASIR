@@ -1,0 +1,38 @@
+name: uptime-kuma
+
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    container_name: uptime-kuma
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+    environment:
+      - TZ=Europe/Madrid
+
+    ports:
+      - "192.168.1.35:3001:3001" # Dashboard LAN
+
+    volumes:
+      - ./data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    networks:
+      - proxy_net
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+
+networks:
+  proxy_net:
+    external: true
