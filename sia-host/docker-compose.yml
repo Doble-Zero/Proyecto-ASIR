@@ -1,0 +1,49 @@
+name: sia-host
+
+services:
+  hostd:
+    image: ghcr.io/siafoundation/hostd:latest
+    container_name: hostd
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+    environment:
+      - TZ=Europe/Madrid
+
+    ports:
+      - "127.0.0.1:9980:9980/tcp" # UI solo local
+      - "9981-9984:9981-9984/tcp" # Trafico de Sia
+      - "9984:9984/udp"           # Tráfico RHP4 (UDP/QUIC)
+
+    volumes:
+      # configuración y DB
+      - ./data:/data
+      # Mapeo de los discos fisicos 
+      - /mnt/node1:/storage/node1
+      - /mnt/node2:/storage/node2
+      - /mnt/node3:/storage/node3
+      - /mnt/node4:/storage/node4
+      - /mnt/node5:/storage/node5
+      - /mnt/node6:/storage/node6
+      - /mnt/node7:/storage/node7
+      - /mnt/node8:/storage/node8
+
+    networks:
+      - sia_net
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 10G
+
+networks:
+  sia_net:
+    driver: bridge
